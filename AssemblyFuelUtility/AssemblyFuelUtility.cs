@@ -41,7 +41,7 @@ namespace AssemblyFuelUtility
 
         private void Update()
         {
-            if (_fuel != null && _fuel.Changed)
+            if (_fuel != null)
             {
                 _fuel.Apply(EditorLogic.fetch.ship);
 
@@ -87,8 +87,8 @@ namespace AssemblyFuelUtility
                 _jEngine.SetValue("_ship", ship);
                 _jEngine.SetValue("_toggleOn", _toggleOn);
 
-                //_jEngineSource = System.IO.File.ReadAllText(IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_scripts.js"));
-                //_jEngine.Execute(_jEngineSource);
+                _jEngineSource = System.IO.File.ReadAllText(IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_scripts.js"));
+                _jEngine.Execute(_jEngineSource);
 
                 var state = (object[])_jEngine.Execute("renderMainGui();").GetCompletionValue().ToObject();
 
@@ -129,7 +129,7 @@ namespace AssemblyFuelUtility
         {
             foreach (var part in ship.parts)
             {
-                if (part.Resources.list.Any(r => FuelTypes.All.Contains(r.resourceName))) return true;
+                if (part.Resources.list.Any(r => FuelTypes.AllNames().Contains(r.resourceName))) return true;
             }
 
             return false;

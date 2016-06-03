@@ -9,123 +9,108 @@ namespace AssemblyFuelUtility
 {
     public class FuelModel
     {
-        private float _liquidFuel;
-        public float LiquidFuel
+        private float _overrideAllAmount = 0;
+        public float OverrideAllAmount
         {
             get
             {
-                return _liquidFuel;
+                return _overrideAllAmount;
             }
             set
             {
-                if (value != _liquidFuel)
+                if (value != _overrideAllAmount)
                 {
-                    Changed = true;
-                }
+                    SetAll(value);
 
-                _liquidFuel = value;
+                    _overrideAllAmount = value;
+                }
             }
         }
 
-        private float _oxidizer;
-        public float Oxidizer
+        public bool OverrideAllRatioClamp { get; set; }
+
+        private Dictionary<FuelType, float> _model;
+
+        public void SetAll(float amount)
         {
-            get
-            {
-                return _oxidizer;
-            }
-            set
-            {
-                if (value != _oxidizer)
-                {
-                    Changed = true;
-                }
+            if (_model == null) _model = new Dictionary<FuelType, float>();
 
-                _oxidizer = value;
+            foreach(var fuelType in FuelTypes.All())
+            {
+                Set(fuelType, amount);
             }
         }
 
-        private float _solid;
-        public float SolidFuel
+        public void Set(string typeName, float amount)
         {
-            get
-            {
-                return _solid;
-            }
-            set
-            {
-                if (value != _solid)
-                {
-                    Changed = true;
-                }
+            if (_model == null) _model = new Dictionary<FuelType, float>();
 
-                _solid = value;
+            var type = FuelTypes.FromString(typeName);
+
+            if (type != FuelType.Unknown)
+            {
+                Set(type, amount);
             }
         }
 
-        private float _monoprop;
-        public float Monoprop
+        public void Set(FuelType type, float amount)
         {
-            get
-            {
-                return _monoprop;
-            }
-            set
-            {
-                if (value != _monoprop)
-                {
-                    Changed = true;
-                }
+            if (_model == null) _model = new Dictionary<FuelType, float>();
 
-                _monoprop = value;
+            if (!_model.ContainsKey(type) || amount != _model[type])
+            {
+                Changed = true;
             }
+
+            _model[type] = amount;
         }
 
-        public bool Changed { get; private set; }
+        public float Get(FuelType type)
+        {
+            if (_model == null) return -1;
+
+            if (!_model.ContainsKey(type)) return -1;
+
+            return _model[type];
+        }
+
+        public float Get(string typeName)
+        {
+            return Get(FuelTypes.FromString(typeName));
+        }
+
+        private bool Changed { get; set; }
 
         public void Apply(ShipConstruct ship)
         {
-            foreach (var part in ship.parts)
+            if (Changed)
             {
-                foreach (var resource in part.Resources.list)
+                foreach (var part in ship.parts)
                 {
-                    switch (resource.resourceName)
+                    foreach (var resource in part.Resources.list)
                     {
-                        case FuelTypes.LiquidFuel:
+                        foreach (var fuelType in FuelTypes.All())
+                        {
+                            if (resource.resourceName == fuelType.ToString() && _model.ContainsKey(fuelType))
                             {
-                                resource.amount = resource.maxAmount * this.LiquidFuel;
-                                break;
+                                resource.amount = resource.maxAmount * _model[fuelType];
                             }
-                        case FuelTypes.Oxidizer:
-                            {
-                                resource.amount = resource.maxAmount * this.Oxidizer;
-                                break;
-                            }
-                        case FuelTypes.SolidFuel:
-                            {
-                                resource.amount = resource.maxAmount * this.SolidFuel;
-                                break;
-                            }
-                        case FuelTypes.Monopropellant:
-                            {
-                                resource.amount = resource.maxAmount * this.Monoprop;
-                                break;
-                            }
+                        }
                     }
                 }
+
+                var resourceEditors = EditorLogic.FindObjectsOfType<UIPartActionResourceEditor>();
+
+                foreach (var ed in resourceEditors)
+                {
+                    ed.resourceAmnt.text = ed.Resource.amount.ToString("F1");
+                    ed.slider.value = (float)(ed.Resource.amount / ed.Resource.maxAmount);
+                }
+
+                GameEvents.onEditorShipModified.Fire(ship);
+
+                Changed = false;
             }
-
-            var resourceEditors = EditorLogic.FindObjectsOfType<UIPartActionResourceEditor>();
-
-            foreach (var ed in resourceEditors)
-            {
-                ed.resourceAmnt.text = ed.Resource.amount.ToString("F1");
-                ed.slider.value = (float)(ed.Resource.amount / ed.Resource.maxAmount);
-            }
-
-            GameEvents.onEditorShipModified.Fire(ship);
-
-            Changed = false;
         }
 
         public override int GetHashCode()

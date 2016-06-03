@@ -82,6 +82,7 @@ namespace AssemblyFuelUtility.Settings
 
         #region FuelModel
 
+        //CD: Todo. Make this dynamic.
         public FuelModel FuelModel
         {
             get
@@ -94,13 +95,14 @@ namespace AssemblyFuelUtility.Settings
                     {
                         string[] vals = stored.Split(':');
 
-                        return new FuelModel
-                        {
-                            LiquidFuel = float.Parse(vals[0]),
-                            Oxidizer = float.Parse(vals[1]),
-                            SolidFuel = float.Parse(vals[2]),
-                            Monoprop = float.Parse(vals[3]),
-                        };
+                        var model = new FuelModel();
+
+                        model.Set(FuelType.LiquidFuel, float.Parse(vals[0]));
+                        model.Set(FuelType.Oxidizer, float.Parse(vals[1]));
+                        model.Set(FuelType.SolidFuel, float.Parse(vals[2]));
+                        model.Set(FuelType.MonoPropellant, float.Parse(vals[3]));
+
+                        return model;
                     }
                 }
                 catch(Exception ex)
@@ -112,7 +114,11 @@ namespace AssemblyFuelUtility.Settings
             }
             set
             {
-                string serialized = String.Format("{0}:{1}:{2}:{3}", value.LiquidFuel, value.Oxidizer, value.SolidFuel, value.Monoprop);
+                string serialized = String.Format("{0}:{1}:{2}:{3}", 
+                    value.Get(FuelType.LiquidFuel), 
+                    value.Get(FuelType.Oxidizer), 
+                    value.Get(FuelType.SolidFuel), 
+                    value.Get(FuelType.MonoPropellant));
 
                 _node.SetValue("FuelModel", serialized, true);
             }
