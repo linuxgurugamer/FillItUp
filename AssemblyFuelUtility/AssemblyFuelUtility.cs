@@ -16,7 +16,9 @@ namespace AssemblyFuelUtility
     {
         private int _windowId;
         private bool _toggleOn = false;
+        private string[] _fuelTypes;
         private string _jEngineSource = "";
+        private float _timeSinceLastRebuild = 0;
         private JEngine _jEngine;
         private AssemblyFuelConfigNode _config;
         private Rect _windowPosition;
@@ -26,11 +28,10 @@ namespace AssemblyFuelUtility
         {
             Debug.Log("AssemblyFuelUtility Awake");
 
-            _config = AssemblyFuelConfigNode.LoadOrCreate(GetEnsuredConfigPath());
-
+            _config = AssemblyFuelConfigNode.LoadOrCreate();
             _windowId = WindowHelper.NextWindowId("AssemblyFuelUtility");
             _windowPosition = new Rect(_config.WindowX, _config.WindowY, 0, 0);
-            _fuel = _config.FuelModel;
+            _fuel = new FuelModel();
 
             _jEngine = CreateJintEngine();
             _jEngineSource = System.IO.File.ReadAllText(IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_scripts.js"));
@@ -41,11 +42,18 @@ namespace AssemblyFuelUtility
 
         private void Update()
         {
+            _timeSinceLastRebuild += Time.deltaTime;
+
+            if (_timeSinceLastRebuild >= 0.5)
+            {
+                _timeSinceLastRebuild = 0;
+
+                RebuildModel();
+            }
+
             if (_fuel != null)
             {
                 _fuel.Apply(EditorLogic.fetch.ship);
-
-                _config.FuelModel = _fuel;
             }
         }
 
@@ -84,11 +92,16 @@ namespace AssemblyFuelUtility
 
                 //Variables
                 _jEngine.SetValue("_fuel", _fuel);
+                _jEngine.SetValue("_fuelTypes", _fuelTypes);
                 _jEngine.SetValue("_ship", ship);
                 _jEngine.SetValue("_toggleOn", _toggleOn);
 
+                #if DEBUG
+
                 _jEngineSource = System.IO.File.ReadAllText(IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_scripts.js"));
                 _jEngine.Execute(_jEngineSource);
+
+                #endif
 
                 var state = (object[])_jEngine.Execute("renderMainGui();").GetCompletionValue().ToObject();
 
@@ -112,27 +125,14 @@ namespace AssemblyFuelUtility
 
             GUI.DragWindow();
         }
-        
+
         #region Utility
 
-        private bool ShipHasAnyPartsContaining(ShipConstruct ship, string fuelName)
+        private void RebuildModel()
         {
-            foreach (var part in ship.parts)
-            {
-                if (part.Resources.list.Any(r => r.resourceName == fuelName)) return true;
-            }
+            _fuelTypes = FuelTypes.Discover(EditorLogic.fetch.ship);
 
-            return false;
-        }
-
-        private bool ShipHasAnyFuelParts(ShipConstruct ship)
-        {
-            foreach (var part in ship.parts)
-            {
-                if (part.Resources.list.Any(r => FuelTypes.AllNames().Contains(r.resourceName))) return true;
-            }
-
-            return false;
+            _fuel.SetFuelTypes(_fuelTypes);
         }
 
         private JEngine CreateJintEngine()
@@ -141,9 +141,6 @@ namespace AssemblyFuelUtility
                 AllowClr().
                 AllowClr(typeof(GUILayout).Assembly).
                 AllowClr(typeof(AssemblyFuelUtility).Assembly));
-            
-            engine.SetValue("ShipHasAnyFuelParts", new Func<ShipConstruct, bool>(ShipHasAnyFuelParts));
-            engine.SetValue("ShipHasAnyPartsContaining", new Func<ShipConstruct, string, bool>(ShipHasAnyPartsContaining));
 
             return engine;
         }
@@ -157,20 +154,7 @@ namespace AssemblyFuelUtility
             _config.WindowX = _windowPosition.x;
             _config.WindowY = _windowPosition.y;
 
-            _config.Save(GetEnsuredConfigPath());
-        }
-
-        private string GetEnsuredConfigPath()
-        {
-            string path = IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_settings.cfg");
-            string directory = System.IO.Path.GetDirectoryName(path);
-
-            if (!System.IO.Directory.Exists(directory))
-            {
-                System.IO.Directory.CreateDirectory(directory);
-            }
-
-            return path;
+            _config.Save();
         }
 
         #endregion

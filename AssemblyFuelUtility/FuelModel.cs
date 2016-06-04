@@ -9,8 +9,48 @@ namespace AssemblyFuelUtility
 {
     public class FuelModel
     {
+        private bool Changed { get; set; }
         private float _overrideAllAmount = 0;
-        public float OverrideAllAmount
+        private string[] _fuelTypes = new string[0];
+        private Dictionary<string, float> _model;
+
+        public void SetFuelTypes(string[] fuelTypes)
+        {
+            _fuelTypes = fuelTypes;
+        }
+
+        public void SetAll(float amount)
+        {
+            if (_model == null) _model = new Dictionary<string, float>();
+
+            foreach(var fuelType in _fuelTypes)
+            {
+                Set(fuelType, amount);
+            }
+        }
+
+        public void Set(string type, float amount)
+        {
+            if (_model == null) _model = new Dictionary<string, float>();
+
+            if (!_model.ContainsKey(type) || amount != _model[type])
+            {
+                Changed = true;
+            }
+
+            _model[type] = amount;
+        }
+
+        public float Get(string type)
+        {
+            if (_model == null) return -1;
+
+            if (!_model.ContainsKey(type)) return -1;
+
+            return _model[type];
+        }
+        
+        public float OverrideAll
         {
             get
             {
@@ -27,60 +67,6 @@ namespace AssemblyFuelUtility
             }
         }
 
-        public bool OverrideAllRatioClamp { get; set; }
-
-        private Dictionary<FuelType, float> _model;
-
-        public void SetAll(float amount)
-        {
-            if (_model == null) _model = new Dictionary<FuelType, float>();
-
-            foreach(var fuelType in FuelTypes.All())
-            {
-                Set(fuelType, amount);
-            }
-        }
-
-        public void Set(string typeName, float amount)
-        {
-            if (_model == null) _model = new Dictionary<FuelType, float>();
-
-            var type = FuelTypes.FromString(typeName);
-
-            if (type != FuelType.Unknown)
-            {
-                Set(type, amount);
-            }
-        }
-
-        public void Set(FuelType type, float amount)
-        {
-            if (_model == null) _model = new Dictionary<FuelType, float>();
-
-            if (!_model.ContainsKey(type) || amount != _model[type])
-            {
-                Changed = true;
-            }
-
-            _model[type] = amount;
-        }
-
-        public float Get(FuelType type)
-        {
-            if (_model == null) return -1;
-
-            if (!_model.ContainsKey(type)) return -1;
-
-            return _model[type];
-        }
-
-        public float Get(string typeName)
-        {
-            return Get(FuelTypes.FromString(typeName));
-        }
-
-        private bool Changed { get; set; }
-
         public void Apply(ShipConstruct ship)
         {
             if (Changed)
@@ -89,7 +75,7 @@ namespace AssemblyFuelUtility
                 {
                     foreach (var resource in part.Resources.list)
                     {
-                        foreach (var fuelType in FuelTypes.All())
+                        foreach (var fuelType in _fuelTypes)
                         {
                             if (resource.resourceName == fuelType.ToString() && _model.ContainsKey(fuelType))
                             {
@@ -104,9 +90,10 @@ namespace AssemblyFuelUtility
                 foreach (var ed in resourceEditors)
                 {
                     ed.resourceAmnt.text = ed.Resource.amount.ToString("F1");
+                    ed.resourceMax.text = ed.Resource.maxAmount.ToString("F1");
                     ed.slider.value = (float)(ed.Resource.amount / ed.Resource.maxAmount);
                 }
-
+                
                 GameEvents.onEditorShipModified.Fire(ship);
 
                 Changed = false;

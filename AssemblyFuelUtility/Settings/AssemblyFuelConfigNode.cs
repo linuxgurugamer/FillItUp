@@ -1,4 +1,5 @@
 ﻿using AssemblyFuelUtility.Util;
+using KSP.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,38 +12,38 @@ namespace AssemblyFuelUtility.Settings
 {
     public class AssemblyFuelConfigNode
     {
-        #region Static
-
-        public static AssemblyFuelConfigNode LoadOrCreate(string fileFullPath)
-        {
-            var internalNode = ConfigNode.Load(fileFullPath);
-
-            if (internalNode == null)
-            {
-                internalNode = new ConfigNode();
-
-                return new AssemblyFuelConfigNode(internalNode)
-                {
-                    WindowX = 100,
-                    WindowY = 100
-                };
-            }
-
-            return new AssemblyFuelConfigNode(internalNode);
-        }
-
-        #endregion
-
         private ConfigNode _node;
         public AssemblyFuelConfigNode(ConfigNode node)
         {
             _node = node;
         }
 
-        public void Save(string fileFullPath)
+        public void Save()
         {
+            string fileFullPath = GetEnsuredConfigPath();
+
             _node.Save(fileFullPath);
         }
+
+        #region Ignored Resource Types
+
+        public string[] IgnoredResources
+        {
+            get
+            {
+                string stored = _node.GetValue("IgnoredResources");
+
+                if (String.IsNullOrEmpty(stored)) return new string[0];
+
+                return stored.Split(';');
+            }
+            set
+            {
+                _node.SetValue("IgnoredResources", String.Join(";", value), true);
+            }
+        }
+
+        #endregion
 
         #region Window Position
 
@@ -80,51 +81,42 @@ namespace AssemblyFuelUtility.Settings
 
         #endregion
 
-        #region FuelModel
+        #region Static
 
-        //CD: Todo. Make this dynamic.
-        public FuelModel FuelModel
+        public static AssemblyFuelConfigNode LoadOrCreate()
         {
-            get
+            string fileFullPath = GetEnsuredConfigPath();
+
+            var internalNode = ConfigNode.Load(fileFullPath);
+
+            if (internalNode == null)
             {
-                try
+                internalNode = new ConfigNode();
+
+                return new AssemblyFuelConfigNode(internalNode)
                 {
-                    string stored = _node.GetValue("FuelModel");
-
-                    if (!String.IsNullOrEmpty(stored))
-                    {
-                        string[] vals = stored.Split(':');
-
-                        var model = new FuelModel();
-
-                        model.Set(FuelType.LiquidFuel, float.Parse(vals[0]));
-                        model.Set(FuelType.Oxidizer, float.Parse(vals[1]));
-                        model.Set(FuelType.SolidFuel, float.Parse(vals[2]));
-                        model.Set(FuelType.MonoPropellant, float.Parse(vals[3]));
-
-                        return model;
-                    }
-                }
-                catch(Exception ex)
-                {
-                    Debug.LogErrorFormat("Unable to load FuelModel from settings.\r\n{0}\r\n{1}", ex.Message, ex.StackTrace);
-                }
-
-                return new FuelModel();
+                    WindowX = 100,
+                    WindowY = 100
+                };
             }
-            set
+
+            return new AssemblyFuelConfigNode(internalNode);
+        }
+
+
+        private static string GetEnsuredConfigPath()
+        {
+            string path = IOUtils.GetFilePathFor(typeof(AssemblyFuelUtility), "afu_settings.cfg");
+            string directory = System.IO.Path.GetDirectoryName(path);
+
+            if (!System.IO.Directory.Exists(directory))
             {
-                string serialized = String.Format("{0}:{1}:{2}:{3}", 
-                    value.Get(FuelType.LiquidFuel), 
-                    value.Get(FuelType.Oxidizer), 
-                    value.Get(FuelType.SolidFuel), 
-                    value.Get(FuelType.MonoPropellant));
-
-                _node.SetValue("FuelModel", serialized, true);
+                System.IO.Directory.CreateDirectory(directory);
             }
+
+            return path;
         }
 
         #endregion
-
     }
 }

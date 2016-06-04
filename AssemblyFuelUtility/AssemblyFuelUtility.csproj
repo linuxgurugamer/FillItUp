@@ -68,6 +68,7 @@
     <Compile Include="Util\WindowHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="GameData\AssemblyFuelUtility\PluginData\AssemblyFuelUtility\afu_settings.cfg" />
     <None Include="TestNoLaunch.bat" />
     <None Include="Test.bat" />
   </ItemGroup>
