@@ -1,0 +1,9 @@
+0.1.0
+	Adoption by LinuxGuruGamer
+	Renamed to FillItUp
+    Added support for changing fuel levels in multiple stages
+    Added ToolbarController support
+    Added ClickThroughBlocker support
+    Added standard build files
+	Added AssemblyVersion.tt
+	Changed background to solid

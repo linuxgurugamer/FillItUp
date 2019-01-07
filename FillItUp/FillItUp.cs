@@ -159,7 +159,7 @@ namespace FillItUp
                     _windowPosition.width = 400;
                 }
 
-                _windowPosition = ClickThruBlocker.GUILayoutWindow(_windowId, _windowPosition, RenderWindowContent, "Assembly Fuel Utility", _windowStyle);
+                _windowPosition = ClickThruBlocker.GUILayoutWindow(_windowId, _windowPosition, RenderWindowContent, "Fill It Up", _windowStyle);
             }
         }
         float allFuels = 100;
@@ -329,16 +329,16 @@ namespace FillItUp
         ToolbarControl toolbarControl = null;
 
         internal const string MODID = "FillItUp_NS";
-        internal const string MODNAME = "Assembly Fuel Utility";
+        internal const string MODNAME = "Fill It Up";
         private void OnGUIAppLauncherReady()
         {
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(OnAFUToggle, OnAFUToggle,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
                 MODID,
-                "assemblyFuelUtilityButton",
-                "FillItUp/PluginData/AFUIcon_38",
-                "FillItUp/PluginData/AFUIcon_24",
+                "fillItUpButton",
+                "FillItUp/PluginData/FIUIcon_38",
+                "FillItUp/PluginData/FIUIcon_24",
                 MODNAME
             );
         }

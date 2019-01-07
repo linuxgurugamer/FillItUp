@@ -106,7 +106,7 @@ namespace FillItUp
 
         private static string GetEnsuredConfigPath()
         {
-            string path = "GameData/FillItUp/PluginData/afu_settings.cfg";
+            string path = "GameData/FillItUp/PluginData/FillItUp.cfg";
             
             return path;
         }

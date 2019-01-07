@@ -8,9 +8,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BC5E0CDD-7D27-44AD-8AC6-1F1D8C43A381}"
 	ProjectSection(SolutionItems) = preProject
 		buildRelease.bat = buildRelease.bat
+		Changelog.txt = Changelog.txt
 		deploy.bat = deploy.bat
 		FillItUp.version = FillItUp.version
 		jenkins.txt = jenkins.txt
+		License.txt = License.txt
 		README.md = README.md
 	EndProjectSection
 EndProject

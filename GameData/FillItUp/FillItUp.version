@@ -2,13 +2,12 @@
   "NAME": "FillItUp",
   "URL": "http://ksp.spacetux.net/avc/FillItUp",
   "DOWNLOAD": "https://github.com/linuxgurugamer/FillItUp/releases",
-  "CHANGE_LOG_URL": "http://forum.kerbalspaceprogram.com/index.php?/topic/147144-113-pwb-fuel-balancer-revived-07-sep-2016/",
     "GITHUB": {
     "USERNAME": "linuxgurugamer",
     "REPOSITORY": "FillItUp"
   },
   "VERSION": {
-    "MAJOR": 1,
+    "MAJOR": 0,
     "MINOR": 1,
     "PATCH": 0,
     "BUILD": 0
