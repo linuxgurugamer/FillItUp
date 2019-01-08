@@ -91,10 +91,13 @@ namespace FillItUp
 
                             if (resource.resourceName == fuelType.Second)
                             {
-                                float f;
-                                if (model.TryGetValue(key, out f))
+                                if (!FillItUp.Instance.ignoreLockedTanks || resource.flowState)
                                 {
-                                    resource.amount = resource.maxAmount * f;
+                                    float f;
+                                    if (model.TryGetValue(key, out f))
+                                    {
+                                        resource.amount = resource.maxAmount * f;
+                                    }
                                 }
                                 break;
                             }

@@ -156,7 +156,7 @@ namespace FillItUp
                 if (Event.current.type == EventType.Layout)
                 {
                     _windowPosition.height = 100;
-                    _windowPosition.width = 400;
+                    _windowPosition.width = 425;
                 }
 
                 _windowPosition = ClickThruBlocker.GUILayoutWindow(_windowId, _windowPosition, RenderWindowContent, "Fill It Up", _windowStyle);
@@ -166,6 +166,7 @@ namespace FillItUp
         internal SortedDictionary <int, float>  allFuelsByStage = new SortedDictionary<int, float>();
 
         bool byStages = false;
+        internal bool ignoreLockedTanks = true;
 
         int maxLabelSize = 0;
 
@@ -181,6 +182,8 @@ namespace FillItUp
             }
             GUILayout.BeginHorizontal();
             GUILayout.Label("Fuel Mixer", boldLabelFont);
+            GUILayout.FlexibleSpace();
+            ignoreLockedTanks = GUILayout.Toggle(ignoreLockedTanks, "Ignore locked tanks");
             GUILayout.FlexibleSpace();
 
             byStages = GUILayout.Toggle(byStages, "By stages");
