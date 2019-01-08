@@ -7,6 +7,8 @@
     Added standard build files
 	Added AssemblyVersion.tt
 	Changed background to solid
+	Removed use of jlint
+	Coded window code in c# for performance improvement over the jlint and reduced code size
 
 0.1.1
 	Added toggle to ignore locked tanks
