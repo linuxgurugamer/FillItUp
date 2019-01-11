@@ -13,3 +13,6 @@
 0.1.1
 	Added toggle to ignore locked tanks
 	Increased width of window slightly to avoid horizontal scroll bar when multiple stages are shown
+
+0.1.1.1
+	Fixed nullref when vessel destroyed inflight

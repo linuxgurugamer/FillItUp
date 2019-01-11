@@ -41,6 +41,7 @@ namespace FillItUp
             Instance = this;
             //GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
             OnGUIAppLauncherReady();
+
             //GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
             GameEvents.onEditorLoad.Add(OnEditorLoad);
             GameEvents.onEditorUndo.Add(OnEditorUndo);
@@ -57,6 +58,7 @@ namespace FillItUp
 
             _windowStyle = new GUIStyle(HighLogic.Skin.window);
         }
+
         void OnGUIStageSequenceModified()
         {
             Debug.Log("FillItUp.OnGUIStageSequenceModified");
@@ -126,13 +128,17 @@ namespace FillItUp
                 toolbarControl.OnDestroy();
                 Destroy(toolbarControl);
             }
-            GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
-            GameEvents.onPartAttach.Remove(this.onPartAttachRemove);
             GameEvents.onEditorLoad.Remove(OnEditorLoad);
             GameEvents.onEditorUndo.Remove(OnEditorUndo);
             GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
+
             GameEvents.onEditorLoad.Remove(this.OnShipLoad);
             GameEvents.onPartPriorityChanged.Remove(this.OnPartPriorityChanged);
+
+            GameEvents.onPartRemove.Remove(this.onPartAttachRemove);
+            GameEvents.onPartAttach.Remove(this.onPartAttachRemove);
+            GameEvents.onEditorPartPlaced.Remove(this.OnPartPriorityChanged);
+
             GameEvents.StageManager.OnGUIStageSequenceModified.Remove(OnGUIStageSequenceModified);
         }
 
@@ -303,6 +309,8 @@ namespace FillItUp
 
         private void RebuildModel()
         {
+            if (!HighLogic.LoadedSceneIsEditor)
+                return;
             Debug.Log("FillItUp.RebuildModel");
             FuelTypes.Discover(EditorLogic.fetch.ship, out allShipResources, out allPartsResourcesByStage, out allPartsResourcesShip);
 
