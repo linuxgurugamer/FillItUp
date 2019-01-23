@@ -1,2 +1,1 @@
 
-Increase width of window IF scrolling to avoid horizontal scroll bar at bottom

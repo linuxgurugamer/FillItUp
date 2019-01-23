@@ -16,3 +16,6 @@
 
 0.1.1.1
 	Fixed nullref when vessel destroyed inflight
+
+0.1.1.2
+	Changed cfg file to contain a node rather than just the data, makes it easier for MM scripts to make changes

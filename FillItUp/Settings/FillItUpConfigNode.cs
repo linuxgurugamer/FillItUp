@@ -12,6 +12,8 @@ namespace FillItUp
 {
     public class FillItUpConfigNode
     {
+        const string NODE = "FILLITUP";
+        const string IGNORED = "IgnoredResources";
         private ConfigNode _node;
         public FillItUpConfigNode(ConfigNode node)
         {
@@ -21,8 +23,11 @@ namespace FillItUp
         public void Save()
         {
             string fileFullPath = GetEnsuredConfigPath();
-
-            _node.Save(fileFullPath);
+            if (!_node.HasValue(IGNORED))
+                IgnoredResources = new string[]{ ""};
+            ConfigNode file = new ConfigNode();
+            file.AddNode(NODE, _node);
+            file.Save(fileFullPath);
         }
 
         #region Ignored Resource Types
@@ -31,7 +36,7 @@ namespace FillItUp
         {
             get
             {
-                string stored = _node.GetValue("IgnoredResources");
+                string stored = _node.GetValue(IGNORED);
 
                 if (String.IsNullOrEmpty(stored)) return new string[0];
 
@@ -39,7 +44,7 @@ namespace FillItUp
             }
             set
             {
-                _node.SetValue("IgnoredResources", String.Join(";", value), true);
+                _node.SetValue(IGNORED, String.Join(";", value), true);
             }
         }
 
@@ -87,7 +92,14 @@ namespace FillItUp
         {
             string fileFullPath = GetEnsuredConfigPath();
 
-            var internalNode = ConfigNode.Load(fileFullPath);
+            ConfigNode file = ConfigNode.Load(fileFullPath);
+            ConfigNode internalNode = null;
+
+            if (file != null)
+            {
+                if (file.HasNode(NODE))
+                    internalNode = file.GetNode(NODE);                    
+            }
 
             if (internalNode == null)
             {
