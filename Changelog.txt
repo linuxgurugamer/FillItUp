@@ -28,3 +28,4 @@
 	Added stock settings page to control if locked settings should be saved or not, also whether tooltips should be shown
 	Fixed issue where expanded stages were immediately closing if a change was made
 	Added tooltips
+	Added numeric entry for the "All" slider
