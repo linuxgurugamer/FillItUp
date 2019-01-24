@@ -19,3 +19,12 @@
 
 0.1.1.2
 	Changed cfg file to contain a node rather than just the data, makes it easier for MM scripts to make changes
+
+0.1.2
+	Removed IgnoredResources from FillItUp/PluginData/FillItUp.cfg
+	Added new file: FillItUp/IgnoredResources.cfg which now contains the ignored resources, one per line.  This change was done so that the resources can be changed at runtime with a ModuleManager script
+	Added ability to lock resources in the Editor for this mod.  This works on single stages as well as the entire vessel
+	Added saving of locked settings for all stages only.  
+	Added stock settings page to control if locked settings should be saved or not, also whether tooltips should be shown
+	Fixed issue where expanded stages were immediately closing if a change was made
+	Added tooltips
