@@ -18,11 +18,11 @@ namespace FillItUp
         static public FillItUp Instance;
         private int _windowId;
         private bool _toggleOn = false;
-        private FuelTypes.StageResDef allShipResources;
+        private FuelTypes.StageResDef allShipResources = null;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesByStage;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesShip;
 
-        private FillItUpConfigNode _config;
+        internal FillItUpConfigNode _config;
         private Rect _windowPosition;
         private FuelModel _resourcesByStage;
         private FuelModel _resourcesShip;
@@ -112,13 +112,14 @@ namespace FillItUp
                 }
                 else
                 {
-                    _resourcesShip.Apply(EditorLogic.fetch.ship,-1, allShipResources);
+                    _resourcesShip.Apply(EditorLogic.fetch.ship, StageRes.ALLSTAGES, allShipResources);
                 }
             }
         }
 
         private void OnDestroy()
         {
+            Debug.Log("FillItUp.OnDestroy");
             Save();
 
             //Clean up
@@ -165,6 +166,13 @@ namespace FillItUp
                     _windowPosition.width = 425;
                 }
 
+                if (drawTooltip /* && HighLogic.CurrentGame.Parameters.CustomParams<JanitorsClosetSettings>().buttonTooltip*/ && tooltip != null && tooltip.Trim().Length > 0)
+                {
+                    SetupTooltip();
+                    ClickThruBlocker.GUIWindow(1234, tooltipRect, TooltipWindow, "");
+                }
+
+
                 _windowPosition = ClickThruBlocker.GUILayoutWindow(_windowId, _windowPosition, RenderWindowContent, "Fill It Up", _windowStyle);
             }
         }
@@ -192,12 +200,16 @@ namespace FillItUp
             ignoreLockedTanks = GUILayout.Toggle(ignoreLockedTanks, "Ignore locked tanks");
             GUILayout.FlexibleSpace();
 
-            byStages = GUILayout.Toggle(byStages, "By stages");
+            byStages = GUILayout.Toggle(byStages, new GUIContent("By stages", "Control resources in each stage"));
             GUILayout.EndHorizontal();
             if (!byStages)
-                DoSingleStage( -1, allShipResources, _resourcesShip, ref allFuels);
+                DoSingleStage(StageRes.ALLSTAGES, allShipResources, _resourcesShip, ref allFuels);
             else
                 DoByStage();
+
+            if (Event.current.type == EventType.Repaint && GUI.tooltip != tooltip)
+                tooltip = GUI.tooltip;
+
 
             GUI.DragWindow();
         }
@@ -211,42 +223,62 @@ namespace FillItUp
             foreach (var ftype in _fuelTypes.resources)
             {
                 GUILayout.BeginHorizontal();
+                int stg = stage;
+                bool locked = FillItUp.Instance._config.RuntimeLockedResources.ContainsKey( StageRes.Key2(stg, ftype.First));
+                var s3 = "all stages";
+                if (stage != StageRes.ALLSTAGES)
+                    s3 = "this stage";
+                var newLocked = GUILayout.Toggle(locked,new GUIContent(" ", "Lock this resource in "+s3));
+                if (newLocked != locked)
+                {
+                    if (newLocked)
+                        FillItUp.Instance._config.AddRuntimeLockedResource(stg, ftype.First);
+                    else
+                        FillItUp.Instance._config.RemoveRuntimeLockedResource(stg, ftype.First);
+
+                }
+
                 GUILayout.Label(ftype.First, GUILayout.Width(maxLabelSize + 5));
-                if (GUILayout.Button("E", GUILayout.Width(25)))
+                if (GUILayout.Button(new GUIContent("E", "Empty"), GUILayout.Width(25)))
                 {
                     _resources.Set(stage, ftype.Second, 0);
                 }
                 float f = _resources.Get(stage, ftype.Second) * 100;
 
-                GUIStyle sliderStyle = new GUIStyle("horizontalslider");
+                //GUIStyle sliderStyle = new GUIStyle("horizontalslider");
                 //sliderStyle.padding.top += 5;
                 //GUI.skin.horizontalSlider = sliderStyle;
-                var newf = GUILayout.HorizontalSlider(f, 0, 100,  GUILayout.Width(150));
+                var newf = GUILayout.HorizontalSlider(f, 0, 100,  GUILayout.Width(200));
                 if (newf != f)
                 {
                     newf = Math.Max(0, Math.Min(100, newf));
                     _resources.Set(stage, ftype.Second, newf / 100);
                 }
-                if (GUILayout.Button("F", GUILayout.Width(25)))
+                if (GUILayout.Button(new GUIContent("F", "Full"), GUILayout.Width(25)))
                 {
                     _resources.Set(stage, ftype.Second, 1);
                 }
                 f = (float)Math.Round(_resources.Get(stage, ftype.Second) * 100);
                 string s = GUILayout.TextField(f.ToString(), GUILayout.Width(35));
-                try
+                //if (s != s1)
                 {
-                    var f1 = float.Parse(s);
-                    if (f1 != f)
-                        _resources.Set(stage, ftype.Second, f / 100);
-                } catch
-                { }
-
+                    try
+                    {
+                        var f1 = float.Parse(s);
+                        if (f1 != f)
+                            _resources.Set(stage, ftype.Second, f1 / 100);
+                    }
+                    catch
+                    {
+                        Debug.Log("Error parsing number");
+                    }
+                }
                 GUILayout.Label("%");
                 GUILayout.EndHorizontal();
                 
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label("All Fuels", boldLabelFont);
+            GUILayout.Label("All Active Fuels", boldLabelFont);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Empty", GUILayout.Width(60)))
@@ -262,11 +294,32 @@ namespace FillItUp
                 _resources.SetAll(stage, allFuels / 100);
             }
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Fill", GUILayout.Width(60)))
+            if (GUILayout.Button("Full", GUILayout.Width(50)))
             {
                 _resources.SetAll(stage, 1);
                 allFuels = 100;
             }
+
+            var f2 = (float)Math.Truncate(allFuels);
+            string s1 = GUILayout.TextField(f2.ToString("F0"), GUILayout.Width(35));
+            //if (s != s1)
+            {
+                try
+                {
+                    var f = float.Parse(s1);
+                    if (f2 != f)
+                    {
+                        allFuels = f;
+                        _resources.SetAll(stage, allFuels / 100);
+                    }
+                }
+                catch
+                {
+                    Debug.Log("Error parsing number");
+                }
+            }
+            GUILayout.Label("%");
+
             GUILayout.EndHorizontal();
     
         }
@@ -287,8 +340,10 @@ namespace FillItUp
                     s.Value.stageExpanded = !s.Value.stageExpanded;
                 }
                 GUILayout.EndHorizontal();
-                newNumResVis++;                if (s.Value.stageExpanded)
-                {  newNumResVis += 4;
+                newNumResVis++;
+                if (s.Value.stageExpanded)
+                {
+                    newNumResVis += 4;
                     newNumResVis += s.Value.resources.Count;
                     float f;
                     if (!allFuelsByStage.TryGetValue(s.Key, out f))
@@ -303,6 +358,39 @@ namespace FillItUp
             numResVis = newNumResVis;
         }
 
+        #region Tooltip
+
+        string tooltip = "";
+        bool drawTooltip = true;
+        // Vector2 mousePosition;
+        Vector2 tooltipSize;
+        float tooltipX, tooltipY;
+        Rect tooltipRect;
+        void SetupTooltip()
+        {
+            Vector2 mousePosition;
+            mousePosition.x = Input.mousePosition.x;
+            mousePosition.y = Screen.height - Input.mousePosition.y;
+            //  Log.Info("SetupTooltip, tooltip: " + tooltip);
+            if (tooltip != null && tooltip.Trim().Length > 0)
+            {
+                tooltipSize = HighLogic.Skin.label.CalcSize(new GUIContent(tooltip));
+                tooltipX = (mousePosition.x + tooltipSize.x > Screen.width) ? (Screen.width - tooltipSize.x) : mousePosition.x;
+                tooltipY = mousePosition.y;
+                if (tooltipX < 0) tooltipX = 0;
+                if (tooltipY < 0) tooltipY = 0;
+                tooltipRect = new Rect(tooltipX - 1, tooltipY - tooltipSize.y, tooltipSize.x + 4, tooltipSize.y);
+            }
+        }
+
+        void TooltipWindow(int id)
+        {
+            if (HighLogic.CurrentGame.Parameters.CustomParams<FIU>().displayTooltip)
+                GUI.Label(new Rect(2, 0, tooltipRect.width - 2, tooltipRect.height), tooltip, HighLogic.Skin.label);
+        }
+
+
+        #endregion
         #region Utility
 
 
@@ -312,7 +400,7 @@ namespace FillItUp
             if (!HighLogic.LoadedSceneIsEditor)
                 return;
             Debug.Log("FillItUp.RebuildModel");
-            FuelTypes.Discover(EditorLogic.fetch.ship, out allShipResources, out allPartsResourcesByStage, out allPartsResourcesShip);
+            FuelTypes.Discover(EditorLogic.fetch.ship, ref allShipResources, ref allPartsResourcesByStage, out allPartsResourcesShip);
 
             _resourcesByStage.SetFuelTypes(allShipResources);
             _resourcesShip.SetFuelTypes(allShipResources);
@@ -326,10 +414,11 @@ namespace FillItUp
 
         private void Save()
         {
+            Debug.Log("FillItUp.Save");
             _config.WindowX = _windowPosition.x;
             _config.WindowY = _windowPosition.y;
 
-            _config.Save();
+            _config.FIU_Save();
         }
 
         #endregion

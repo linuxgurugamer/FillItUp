@@ -1,7 +1,0 @@
-FILLITUP
-{
-	WindowX = 522
-	WindowY = 235
-	IgnoredResources = Ore;ElectricCharge;IntakeAir
-}
-

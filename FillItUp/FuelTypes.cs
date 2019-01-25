@@ -8,8 +8,8 @@ namespace FillItUp
 {
     public class FuelTypes
     {
-        static FillItUpConfigNode config;
-
+        //static internal FillItUpConfigNode config = null;
+        static internal IgnoredResourcesConfigNode resources = null;
 
         public class StageResDef
         {
@@ -25,13 +25,16 @@ namespace FillItUp
             }
         }
 
-        public static void Discover(ShipConstruct ship, out StageResDef allResources, out SortedDictionary<int, StageResDef> allPartsResourcesByStage,
+        public static void Discover(ShipConstruct ship, ref StageResDef allResources, ref SortedDictionary<int, StageResDef> allPartsResourcesByStage,
              out SortedDictionary<int, StageResDef>allPartsResourcesShip)
         {
-            if (config == null)
-                config = FillItUpConfigNode.LoadOrCreate();
+            if (FillItUp.Instance._config == null)
+                FillItUp.Instance._config = FillItUpConfigNode.LoadOrCreate();
+            if (resources == null)
+                resources = IgnoredResourcesConfigNode.LoadOrCreate();
 
             int maxStage = -1;
+            SortedDictionary<int, StageResDef> oldPartResByStage = allPartsResourcesByStage;
             allPartsResourcesByStage = new SortedDictionary<int, StageResDef>();
             allPartsResourcesShip = new SortedDictionary<int, StageResDef>();
             StageResDef srd;
@@ -40,20 +43,22 @@ namespace FillItUp
             // Also get max stages
             for (int i = ship.Parts.Count - 1; i >= 0; i--)
             {
-                var partValidResources = ship.Parts[i].Resources.Distinct().Where(r => !config.IgnoredResources.Contains(r.resourceName)).ToList();
+                var partValidResources = ship.Parts[i].Resources.Distinct().Where(r => !resources.IgnoredResources.Contains(r.resourceName)).ToList();
                 if (partValidResources.Count > 0)
                 {
 
                     if (!allPartsResourcesByStage.ContainsKey(ship.Parts[i].inverseStage))
                     {
                         srd = new StageResDef();
+                        if (oldPartResByStage != null & oldPartResByStage.ContainsKey(ship.Parts[i].inverseStage))
+                            srd.stageExpanded = oldPartResByStage[ship.Parts[i].inverseStage].stageExpanded;
                         allPartsResourcesByStage.Add(ship.Parts[i].inverseStage, srd);
                     }
 
-                    if (!allPartsResourcesShip.ContainsKey(-1))
+                    if (!allPartsResourcesShip.ContainsKey(StageRes.ALLSTAGES))
                     {
                         srd = new StageResDef();
-                        allPartsResourcesShip.Add(-1, srd);
+                        allPartsResourcesShip.Add(StageRes.ALLSTAGES, srd);
                     }
 
 
@@ -77,7 +82,7 @@ namespace FillItUp
             foreach (var r2 in r1)
             {
                 var key = new Tuple<string, string>(r2.info.displayName, r2.resourceName);
-                if (!config.IgnoredResources.Contains(r2.resourceName) && !allResources.resources.Contains(key))
+                if (!resources.IgnoredResources.Contains(r2.resourceName) && !allResources.resources.Contains(key))
                 {
                     allResources.resources.Add(key);
                 }

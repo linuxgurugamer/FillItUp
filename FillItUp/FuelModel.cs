@@ -29,7 +29,9 @@ namespace FillItUp
         {
             foreach(var fuelType in fuelTypes.resources)
             {
-                Set(stage, fuelType.Second, amount);
+                bool ignored = FillItUp.Instance._config.RuntimeLockedResources.ContainsKey(StageRes.Key2(stage, fuelType.First));
+                if (!ignored)
+                    Set(stage, fuelType.Second, amount);
             }
         }
 
