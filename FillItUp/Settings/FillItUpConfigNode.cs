@@ -104,6 +104,8 @@ namespace FillItUp
         
         void LockedToNode(Dictionary<string, StageRes> value)
         {
+            if (value == null || _node == null)
+                return;
             string s = "";
             foreach (var s1 in value)
             {

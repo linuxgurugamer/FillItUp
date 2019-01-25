@@ -27,10 +27,10 @@ namespace FillItUp
         private FuelModel _resourcesByStage;
         private FuelModel _resourcesShip;
 
-        GUIStyle _windowStyle;
+        internal GUIStyle _windowStyle;
         private void Awake()
         {
-            Debug.Log("FillItUp Awake");
+            //Debug.Log("FillItUp Awake");
 
             _config = FillItUpConfigNode.LoadOrCreate();
             _windowId = WindowHelper.NextWindowId("FillItUp");
@@ -61,42 +61,42 @@ namespace FillItUp
 
         void OnGUIStageSequenceModified()
         {
-            Debug.Log("FillItUp.OnGUIStageSequenceModified");
+            //Debug.Log("FillItUp.OnGUIStageSequenceModified");
             RebuildModel();
         }
         private void onPartAttachRemove(GameEvents.HostTargetAction<Part, Part> evt)
         {
-            Debug.Log("FillItUp.OnPartPriorityChanged");
+            //Debug.Log("FillItUp.OnPartPriorityChanged");
             RebuildModel();
         }
         private void OnPartPriorityChanged(Part p)
         {
-            Debug.Log("FillItUp.OnPartPriorityChanged");
+            //Debug.Log("FillItUp.OnPartPriorityChanged");
             RebuildModel();
         }
         private void OnShipLoad(ShipConstruct ship, CraftBrowserDialog.LoadType loadType)
         {
-            Debug.Log("FillItUp.OnShipLoad");
+            //Debug.Log("FillItUp.OnShipLoad");
             RebuildModel();
         }
         private void OnEditorShipModified(ShipConstruct sc)
         {
-            Debug.Log("FillItUp.OnEditorShipModified");
+            //Debug.Log("FillItUp.OnEditorShipModified");
             RebuildModel();
         }
         private void OnEditorUndo(ShipConstruct sc)
         {
-            Debug.Log("FillItUp.OnEditorLoad");
+            //Debug.Log("FillItUp.OnEditorLoad");
             RebuildModel();
         }
         private void OnEditorLoad(ShipConstruct sc, CraftBrowserDialog.LoadType lt)
         {
-            Debug.Log("FillItUp.OnEditorLoad");
+            //Debug.Log("FillItUp.OnEditorLoad");
             RebuildModel();
         }
         private void OnEditorPartEvent(ConstructionEventType data0, Part data1)
         {
-            Debug.Log("FillItUp.OnEditorPartEvent");
+            //Debug.Log("FillItUp.OnEditorPartEvent");
             RebuildModel();
         }
 
@@ -115,6 +115,47 @@ namespace FillItUp
                     _resourcesShip.Apply(EditorLogic.fetch.ship, StageRes.ALLSTAGES, allShipResources);
                 }
             }
+        }
+
+        internal bool TanksFull()
+        {
+            if (byStages)
+            {
+                return _resourcesByStage.AreTanksFull(EditorLogic.fetch.ship, allPartsResourcesByStage);
+            }
+            else
+            {
+                return _resourcesShip.AreTanksFull(EditorLogic.fetch.ship, StageRes.ALLSTAGES, allShipResources);
+            }
+        }
+
+        internal void ResetToFull()
+        {
+            Debug.Log("ResetToFull, byStages: " + byStages);
+            float f = 1;
+            if (!byStages)
+            {
+                FillSingleStage(StageRes.ALLSTAGES, allShipResources, _resourcesShip, ref f);
+                _resourcesShip.Apply(EditorLogic.fetch.ship, StageRes.ALLSTAGES, allShipResources);
+
+
+
+            }
+            else
+            {
+                DoByStage();
+                foreach (var s in allPartsResourcesByStage)
+                {
+                    FillSingleStage(s.Key, s.Value, _resourcesByStage, ref f);
+                    _resourcesByStage.Apply(EditorLogic.fetch.ship, allPartsResourcesByStage);
+                }
+            }
+        }
+
+        void FillSingleStage(int stage, FuelTypes.StageResDef _fuelTypes, FuelModel _resources, ref float f)
+        {
+            Debug.Log("FillSingleStage, stage: " + stage);
+            _resources.SetAll(stage, 1);
         }
 
         private void OnDestroy()
@@ -148,14 +189,14 @@ namespace FillItUp
         bool fontInitted = false;
         private void OnGUI()
         {
-           // GUI.skin = HighLogic.Skin;
+            // GUI.skin = HighLogic.Skin;
             if (!fontInitted)
             {
                 boldLabelFont = new GUIStyle(GUI.skin.label);
                 boldLabelFont.fontStyle = FontStyle.Bold;
 
-               horizOffset = GUI.skin.horizontalSlider.padding;
-               // horizOffset.top += 5;
+                horizOffset = GUI.skin.horizontalSlider.padding;
+                // horizOffset.top += 5;
                 fontInitted = true;
             }
             if (_toggleOn)
@@ -177,7 +218,7 @@ namespace FillItUp
             }
         }
         float allFuels = 100;
-        internal SortedDictionary <int, float>  allFuelsByStage = new SortedDictionary<int, float>();
+        internal SortedDictionary<int, float> allFuelsByStage = new SortedDictionary<int, float>();
 
         bool byStages = false;
         internal bool ignoreLockedTanks = true;
@@ -214,8 +255,8 @@ namespace FillItUp
             GUI.DragWindow();
         }
 
-        void DoSingleStage( int stage, FuelTypes.StageResDef _fuelTypes, FuelModel _resources, ref float allFuels)
-        { 
+        void DoSingleStage(int stage, FuelTypes.StageResDef _fuelTypes, FuelModel _resources, ref float allFuels)
+        {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Use the sliders or [E]mpty and [F]ull buttons to adjust fuel in all tanks.");
             GUILayout.EndHorizontal();
@@ -224,11 +265,11 @@ namespace FillItUp
             {
                 GUILayout.BeginHorizontal();
                 int stg = stage;
-                bool locked = FillItUp.Instance._config.RuntimeLockedResources.ContainsKey( StageRes.Key2(stg, ftype.First));
+                bool locked = FillItUp.Instance._config.RuntimeLockedResources.ContainsKey(StageRes.Key2(stg, ftype.First));
                 var s3 = "all stages";
                 if (stage != StageRes.ALLSTAGES)
                     s3 = "this stage";
-                var newLocked = GUILayout.Toggle(locked,new GUIContent(" ", "Lock this resource in "+s3));
+                var newLocked = GUILayout.Toggle(locked, new GUIContent(" ", "Lock this resource in " + s3));
                 if (newLocked != locked)
                 {
                     if (newLocked)
@@ -248,7 +289,7 @@ namespace FillItUp
                 //GUIStyle sliderStyle = new GUIStyle("horizontalslider");
                 //sliderStyle.padding.top += 5;
                 //GUI.skin.horizontalSlider = sliderStyle;
-                var newf = GUILayout.HorizontalSlider(f, 0, 100,  GUILayout.Width(200));
+                var newf = GUILayout.HorizontalSlider(f, 0, 100, GUILayout.Width(200));
                 if (newf != f)
                 {
                     newf = Math.Max(0, Math.Min(100, newf));
@@ -275,7 +316,7 @@ namespace FillItUp
                 }
                 GUILayout.Label("%");
                 GUILayout.EndHorizontal();
-                
+
             }
             GUILayout.BeginHorizontal();
             GUILayout.Label("All Active Fuels", boldLabelFont);
@@ -321,7 +362,7 @@ namespace FillItUp
             GUILayout.Label("%");
 
             GUILayout.EndHorizontal();
-    
+
         }
 
         // The variable to control where the scrollview 'looks' into its child elements.
@@ -433,7 +474,7 @@ namespace FillItUp
         private void OnGUIAppLauncherReady()
         {
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
-            toolbarControl.AddToAllToolbars(OnAFUToggle, OnAFUToggle,
+            toolbarControl.AddToAllToolbars(FIUFUToggle, FIUFUToggle,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
                 MODID,
                 "fillItUpButton",
@@ -443,9 +484,13 @@ namespace FillItUp
             );
         }
 
-        private void OnAFUToggle()
+        void FIUFUToggle()
         {
             _toggleOn = !_toggleOn;
+        }
+        internal void SetToggleOff()
+        {
+            _toggleOn = false;
         }
 
         #endregion

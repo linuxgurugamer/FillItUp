@@ -36,6 +36,10 @@ namespace FillItUp
 #endif
 
 
+        [GameParameters.CustomParameterUI("Warn if launching without full tanks")]
+        public bool warnAtLaunch = true;
+
+
 
 
         public override bool Interactible(MemberInfo member, GameParameters parameters)

@@ -30,6 +30,11 @@ namespace FillItUp
         {
             get
             {
+                for (int i = 0; i < staticIgnoredResources.Count(); i++)
+                {
+                    Debug.Log("IgnoredResources.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
+                }
+
                 return staticIgnoredResources;
             }
 
@@ -48,13 +53,14 @@ namespace FillItUp
         }
 #endif
 
-#endregion
+        #endregion
 
 
-#region Static
+        #region Static
 
         public static IgnoredResourcesConfigNode LoadOrCreate()
         {
+#if false
             string fileFullPath = GetEnsuredConfigPath();
 
             ConfigNode file = ConfigNode.Load(fileFullPath);
@@ -71,28 +77,33 @@ namespace FillItUp
                 internalNode = new ConfigNode();
 
             }
+#endif
+            ConfigNode internalNode = GameDatabase.Instance.GetConfigNode("FillItUp/" + NODE);
 
-
-            if (!internalNode.HasValue(IGNORED))
+            if (internalNode == null)
             {
-                Debug.Log("_node does not have value: " + IGNORED);
+                Debug.Log("Missing ConfigNode: " + "FillItUp/" + NODE);
                 staticIgnoredResources = new string[0];
             }
             else
-            staticIgnoredResources = internalNode.GetValues(IGNORED);
+                staticIgnoredResources = internalNode.GetValues(IGNORED);
 
-
+            Debug.Log("staticIgnoredResources.Count: " + staticIgnoredResources.Count());
+            for (int i = 0; i < staticIgnoredResources.Count(); i++)
+            {
+                Debug.Log("IgnoredResourcesConfigNode.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
+            }
             return new IgnoredResourcesConfigNode(internalNode);
         }
 
-
+#if false
         private static string GetEnsuredConfigPath()
         {
             string path = "GameData/FillItUp/IgnoredResources.cfg";
 
             return path;
         }
-
+#endif
 #endregion
     }
 }

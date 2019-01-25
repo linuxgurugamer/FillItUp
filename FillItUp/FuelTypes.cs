@@ -46,6 +46,7 @@ namespace FillItUp
                 var partValidResources = ship.Parts[i].Resources.Distinct().Where(r => !resources.IgnoredResources.Contains(r.resourceName)).ToList();
                 if (partValidResources.Count > 0)
                 {
+                    // Get the resources for each stage
 
                     if (!allPartsResourcesByStage.ContainsKey(ship.Parts[i].inverseStage))
                     {
@@ -54,6 +55,8 @@ namespace FillItUp
                             srd.stageExpanded = oldPartResByStage[ship.Parts[i].inverseStage].stageExpanded;
                         allPartsResourcesByStage.Add(ship.Parts[i].inverseStage, srd);
                     }
+
+                    // Get the resources for the entire ship
 
                     if (!allPartsResourcesShip.ContainsKey(StageRes.ALLSTAGES))
                     {
@@ -88,10 +91,7 @@ namespace FillItUp
                 }
             }
 
-            allResources.parts = ship.Parts;
-
-
-            //allPartsResourcesByStage = stages;
+            allResources.parts = ship.Parts;          
 
         }
     }

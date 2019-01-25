@@ -43,16 +43,18 @@ namespace FillItUp
             }
             key = new Tuple<string, int>(type, stage);
             float f;
+#if false
             bool b = true;
             if (model.TryGetValue(key, out f))
                 b = (amount != f);
-            //if (!model.ContainsKey(key) || amount != model[key])
+#endif
+
+            bool b = model.TryGetValue(key, out f) ? (amount != f) : true;
             if (b)
             {
                 Changed = true;               
                 model[key] = amount; 
             }
-
         }
 
         public float Get(int stage, string type)
@@ -62,9 +64,48 @@ namespace FillItUp
             float f;
             if (!model.TryGetValue(key, out f))
                 f = 1;
+            
             return f;
         }
 
+        public bool AreTanksFull(ShipConstruct ship, SortedDictionary<int, FuelTypes.StageResDef> stages)
+        {
+            foreach (var s in stages)
+            {
+                if (!AreTanksFull(ship, s.Key, s.Value))
+                    return false;
+            }
+            return true;
+        }
+
+        public bool AreTanksFull(ShipConstruct ship, int stage, FuelTypes.StageResDef stages)
+        {
+            foreach (var part in stages.parts)
+            {
+                foreach (var resource in part.Resources)
+                {
+                    foreach (var fuelType in stages.resources)
+                    {
+                        key = new Tuple<string, int>(fuelType.Second, stage);
+
+                        if (resource.resourceName == fuelType.Second)
+                        {
+                            if (!FillItUp.Instance.ignoreLockedTanks || resource.flowState)
+                            {
+                                float f;
+                                if (model.TryGetValue(key, out f))
+                                {
+                                    if (f < 1)
+                                        return false;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
 
         public void Apply(ShipConstruct ship, SortedDictionary<int, FuelTypes.StageResDef> stages)
         {
