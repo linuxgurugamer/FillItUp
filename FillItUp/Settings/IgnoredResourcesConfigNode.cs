@@ -55,23 +55,19 @@ namespace FillItUp
 
         public static IgnoredResourcesConfigNode LoadOrCreate()
         {
-            string fileFullPath = GetEnsuredConfigPath();
+            ConfigNode internalNode = new ConfigNode();
 
-            ConfigNode file = ConfigNode.Load(fileFullPath);
-            ConfigNode internalNode = null;
+            //We need the ConfigNode after MM could do some magic
+            ConfigNode[] config = GameDatabase.Instance.GetConfigNodes(NODE);
 
-            if (file != null)
+            if (config.Length == 0)
             {
-                if (file.HasNode(NODE))
-                    internalNode = file.GetNode(NODE);
+                Debug.Log($"ConfigNode {NODE} does not exist");
             }
-
-            if (internalNode == null)
-            {
-                internalNode = new ConfigNode();
-
+            else
+            {                
+                internalNode = config[0];
             }
-
 
             if (!internalNode.HasValue(IGNORED))
             {
@@ -85,13 +81,13 @@ namespace FillItUp
             return new IgnoredResourcesConfigNode(internalNode);
         }
 
+        //AFAIK, it is not necessayry anymore
+        //private static string GetEnsuredConfigPath()
+        //{
+        //    string path = "GameData/FillItUp/IgnoredResources.cfg";
 
-        private static string GetEnsuredConfigPath()
-        {
-            string path = "GameData/FillItUp/IgnoredResources.cfg";
-
-            return path;
-        }
+        //    return path;
+        //}
 
 #endregion
     }
