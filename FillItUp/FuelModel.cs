@@ -37,6 +37,7 @@ namespace FillItUp
 
         public void Set(int stage, string type, float amount)
         {
+
             if (model == null)
             {
                 model = new Dictionary<Tuple<string, int>, float>();
@@ -109,16 +110,29 @@ namespace FillItUp
 
         public void Apply(ShipConstruct ship, SortedDictionary<int, FuelTypes.StageResDef> stages)
         {
+            
             if (Changed)
-            { 
+            {
+#if false
+                Log.Info("Apply Dict");
                 foreach (var s in stages)
                 {
-                    Apply(ship, s.Key, s.Value);
+                    foreach (var s2 in s.Value.parts)
+                        Log.Info("Apply, Key: " + s.Key + ", part: " + s2);
+                    foreach (var s3 in s.Value.resources)
+                        Log.Info("Apply, Key: " + s.Key + ", resource: " + s3);
+                }
+                foreach (var m in model)
+                    Log.Info("model.Key: " + m.Key.First + ", " + m.Key.Second + ",   fuel: " + m.Value);
+#endif
+                foreach (var s in stages)
+                {
+                    Apply(ship, s.Key, s.Value, true);
                 }
             }
         }
 
-        public void Apply(ShipConstruct ship, int stage, FuelTypes.StageResDef stages)
+        public void Apply(ShipConstruct ship, int stage, FuelTypes.StageResDef stages, bool allStages = false)
         {
             if (ship == null || stages == null)
                 return;
@@ -130,17 +144,18 @@ namespace FillItUp
                     {
                         foreach (var fuelType in stages.resources)
                         {
-                            key = new Tuple<string, int>(fuelType.Second, stage);
-
                             if (resource.resourceName == fuelType.Second)
                             {
                                 if (!FillItUp.Instance.ignoreLockedTanks || resource.flowState)
                                 {
                                     float f;
+
+                                    key = new Tuple<string, int>(fuelType.Second, stage);
                                     if (model.TryGetValue(key, out f))
                                     {
                                         resource.amount = resource.maxAmount * f;
                                     }
+       
                                 }
                                 break;
                             }
@@ -159,8 +174,8 @@ namespace FillItUp
                 }
 
                 GameEvents.onEditorShipModified.Fire(ship);
-
-                Changed = false;
+                if (!allStages)
+                    Changed = false;
             }
             
         }

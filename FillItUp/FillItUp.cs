@@ -137,9 +137,6 @@ namespace FillItUp
             {
                 FillSingleStage(StageRes.ALLSTAGES, allShipResources, _resourcesShip, ref f);
                 _resourcesShip.Apply(EditorLogic.fetch.ship, StageRes.ALLSTAGES, allShipResources);
-
-
-
             }
             else
             {

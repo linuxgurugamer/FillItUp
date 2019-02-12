@@ -35,3 +35,6 @@
 	Added settings option to check for full tanks before launching
 	Added check for full tanks
 	Added dialog to prompt if tanks aren't full.  Can either continue with launch, fill tanks and launch or cancel
+
+0.1.3.1
+	Fixed bug where the "by stage" option wasn't able to change anything beyond the first stage
