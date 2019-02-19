@@ -18,7 +18,7 @@ namespace FillItUp
         static public FillItUp Instance;
         private int _windowId;
         private bool _toggleOn = false;
-        private FuelTypes.StageResDef allShipResources = null;
+        private FuelTypes.StageResDef allShipResources;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesByStage;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesShip;
 
@@ -31,6 +31,10 @@ namespace FillItUp
         private void Awake()
         {
             //Debug.Log("FillItUp Awake");
+
+            allShipResources = null;
+            allPartsResourcesByStage = null;
+            allPartsResourcesShip = null;
 
             _config = FillItUpConfigNode.LoadOrCreate();
             _windowId = WindowHelper.NextWindowId("FillItUp");

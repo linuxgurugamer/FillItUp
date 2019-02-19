@@ -28,19 +28,30 @@ namespace FillItUp
         public static void Discover(ShipConstruct ship, ref StageResDef allResources, ref SortedDictionary<int, StageResDef> allPartsResourcesByStage,
              out SortedDictionary<int, StageResDef>allPartsResourcesShip)
         {
+            allPartsResourcesShip = new SortedDictionary<int, StageResDef>();
+            if (FillItUp.Instance == null)
+            {
+                return;
+            }
+
             if (FillItUp.Instance._config == null)
                 FillItUp.Instance._config = FillItUpConfigNode.LoadOrCreate();
+
             if (resources == null)
                 resources = IgnoredResourcesConfigNode.LoadOrCreate();
 
+
             int maxStage = -1;
             SortedDictionary<int, StageResDef> oldPartResByStage = allPartsResourcesByStage;
+
             allPartsResourcesByStage = new SortedDictionary<int, StageResDef>();
-            allPartsResourcesShip = new SortedDictionary<int, StageResDef>();
+
+
             StageResDef srd;
 
             // Get all parts in ship into individual lists
             // Also get max stages
+            
             for (int i = ship.Parts.Count - 1; i >= 0; i--)
             {
                 var partValidResources = ship.Parts[i].Resources.Distinct().Where(r => !resources.IgnoredResources.Contains(r.resourceName)).ToList();
@@ -51,8 +62,11 @@ namespace FillItUp
                     if (!allPartsResourcesByStage.ContainsKey(ship.Parts[i].inverseStage))
                     {
                         srd = new StageResDef();
-                        if (oldPartResByStage != null & oldPartResByStage.ContainsKey(ship.Parts[i].inverseStage))
+
+                        if (oldPartResByStage != null && oldPartResByStage.Count > 0 && oldPartResByStage.ContainsKey(ship.Parts[i].inverseStage))
+                        {
                             srd.stageExpanded = oldPartResByStage[ship.Parts[i].inverseStage].stageExpanded;
+                        }
                         allPartsResourcesByStage.Add(ship.Parts[i].inverseStage, srd);
                     }
 
@@ -63,7 +77,7 @@ namespace FillItUp
                         srd = new StageResDef();
                         allPartsResourcesShip.Add(StageRes.ALLSTAGES, srd);
                     }
-
+                    
 
                     srd = allPartsResourcesByStage[ship.Parts[i].inverseStage];
                     srd.parts.Add(ship.Parts[i]);
@@ -82,6 +96,7 @@ namespace FillItUp
             allResources = new StageResDef();
 
             var r1 = ship.Parts.SelectMany(p => p.Resources.Select(r => r)).ToList();
+  
             foreach (var r2 in r1)
             {
                 var key = new Tuple<string, string>(r2.info.displayName, r2.resourceName);

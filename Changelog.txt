@@ -38,3 +38,6 @@
 
 0.1.3.1
 	Fixed bug where the "by stage" option wasn't able to change anything beyond the first stage
+
+0.1.3.2
+	Fixed nullref when entering the editor when there was a single part last in there, the editor would load the "vessel" which was a single part and then there would be a Nullref
