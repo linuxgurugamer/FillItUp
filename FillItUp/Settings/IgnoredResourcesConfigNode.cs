@@ -32,7 +32,7 @@ namespace FillItUp
             {
                 for (int i = 0; i < staticIgnoredResources.Count(); i++)
                 {
-                    Debug.Log("IgnoredResources.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
+                    Log.Info("IgnoredResources.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
                 }
 
                 return staticIgnoredResources;
@@ -82,16 +82,15 @@ namespace FillItUp
 
             if (internalNode == null)
             {
-                Debug.Log("Missing ConfigNode: " + "FillItUp/" + NODE);
+                Log.Error("Missing ConfigNode: " + "FillItUp/" + NODE);
                 staticIgnoredResources = new string[0];
             }
             else
                 staticIgnoredResources = internalNode.GetValues(IGNORED);
-
-            Debug.Log("staticIgnoredResources.Count: " + staticIgnoredResources.Count());
+            
             for (int i = 0; i < staticIgnoredResources.Count(); i++)
             {
-                Debug.Log("IgnoredResourcesConfigNode.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
+                Log.Info("IgnoredResourcesConfigNode.staticIgnoredResource[" + i + ": " + staticIgnoredResources[i] + "]");
             }
             return new IgnoredResourcesConfigNode(internalNode);
         }

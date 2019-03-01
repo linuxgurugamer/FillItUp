@@ -10,6 +10,8 @@ using FillItUp.Util;
 using ClickThroughFix;
 using ToolbarControl_NS;
 
+using SmartTank;
+
 namespace FillItUp
 {
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -28,10 +30,13 @@ namespace FillItUp
         private FuelModel _resourcesShip;
 
         internal GUIStyle _windowStyle;
+
+        internal bool smartTankPresent = false;
+
         private void Awake()
         {
             //Debug.Log("FillItUp Awake");
-
+            smartTankPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "SmartTank");
             allShipResources = null;
             allPartsResourcesByStage = null;
             allPartsResourcesShip = null;
@@ -135,7 +140,6 @@ namespace FillItUp
 
         internal void ResetToFull()
         {
-            Debug.Log("ResetToFull, byStages: " + byStages);
             float f = 1;
             if (!byStages)
             {
@@ -155,13 +159,11 @@ namespace FillItUp
 
         void FillSingleStage(int stage, FuelTypes.StageResDef _fuelTypes, FuelModel _resources, ref float f)
         {
-            Debug.Log("FillSingleStage, stage: " + stage);
             _resources.SetAll(stage, 1);
         }
 
         private void OnDestroy()
         {
-            Debug.Log("FillItUp.OnDestroy");
             Save();
 
             //Clean up
@@ -312,7 +314,7 @@ namespace FillItUp
                     }
                     catch
                     {
-                        Debug.Log("Error parsing number");
+                        Log.Error("Error parsing number");
                     }
                 }
                 GUILayout.Label("%");
@@ -357,7 +359,7 @@ namespace FillItUp
                 }
                 catch
                 {
-                    Debug.Log("Error parsing number");
+                    Log.Error("Error parsing number");
                 }
             }
             GUILayout.Label("%");
@@ -441,7 +443,7 @@ namespace FillItUp
         {
             if (!HighLogic.LoadedSceneIsEditor)
                 return;
-            Debug.Log("FillItUp.RebuildModel");
+  
             FuelTypes.Discover(EditorLogic.fetch.ship, ref allShipResources, ref allPartsResourcesByStage, out allPartsResourcesShip);
 
             _resourcesByStage.SetFuelTypes(allShipResources);
@@ -456,7 +458,6 @@ namespace FillItUp
 
         private void Save()
         {
-            Debug.Log("FillItUp.Save");
             _config.WindowX = _windowPosition.x;
             _config.WindowY = _windowPosition.y;
 
@@ -488,12 +489,24 @@ namespace FillItUp
         void FIUFUToggle()
         {
             _toggleOn = !_toggleOn;
+
+            if (smartTankPresent)
+                doSmartTank();
+
+        }
+        void doSmartTank()
+        {
+            try
+            {
+                SmartTank.SmartTank.Paused = _toggleOn;
+            } catch
+            { }
         }
         internal void SetToggleOff()
         {
             _toggleOn = false;
         }
 
-        #endregion
+#endregion
     }
 }

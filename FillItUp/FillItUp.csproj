@@ -38,6 +38,9 @@
     <Reference Include="ClickThroughBlocker">
       <HintPath>R:\KSP_1.6.1_dev\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
     </Reference>
+    <Reference Include="SmartTank">
+      <HintPath>R:\KSP_1.6.1_dev\GameData\SmartTank\SmartTank.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

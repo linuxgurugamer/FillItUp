@@ -54,18 +54,15 @@ namespace FillItUp
         private ConfigNode _node;
         public FillItUpConfigNode(ConfigNode node)
         {
-            Debug.Log("FillItUpConfigNode Instantiator");
             _node = node;
         }
 
         public void FIU_Save()
         {
             string fileFullPath = GetEnsuredConfigPath();
-
-            Debug.Log("FillItUpConfigNode.Save");
+            
             if (!_node.HasValue(RUNTIMELOCKED))
             {
-                Debug.Log("FillItUpConfigNode.Save, initting RuntimeIgnoredResources");
                 RuntimeLockedResources = new Dictionary<string, StageRes>();
             }
             if (!HighLogic.CurrentGame.Parameters.CustomParams<FIU>().saveGlobalLocked)
@@ -83,7 +80,6 @@ namespace FillItUp
 
         void LoadRuntimeLockedResources(bool init)
         {
-            Debug.Log("FillItUpConfigNode.LoadRuntimeLockedResources");
             string stored = null;
             if (_node.HasValue(RUNTIMELOCKED))
                 stored = _node.GetValue(RUNTIMELOCKED);
@@ -92,7 +88,6 @@ namespace FillItUp
                 runtimeLockedResources =  new Dictionary<string, StageRes>();
             if (stored != null && stored != "")
             {
-                Debug.Log("LoadRuntimeLockedResources, stored: " + stored);
                 var r = stored.Split(';').ToList();
                 foreach (var r1 in r)
                 {
@@ -108,8 +103,7 @@ namespace FillItUp
                 return;
             string s = "";
             foreach (var s1 in value)
-            {
-                Debug.Log("stage: " + s1.Value.stage + ", s1.Value.resource: " + s1.Value.resource);
+            {;
                 if (s1.Value.stage == StageRes.ALLSTAGES)
                 {
                     if (s != "")
@@ -118,7 +112,6 @@ namespace FillItUp
                         s = s1.Value.resource;
                 }
             }
-            Debug.Log("RUNTIMELOCKED: " + s);
             _node.SetValue(RUNTIMELOCKED, s, true);
             LoadRuntimeLockedResources(true);
         }
@@ -156,7 +149,6 @@ namespace FillItUp
        
         public void AddRuntimeLockedResource(int stage, string s)
         {
-            Debug.Log("AddRuntimeLockedResource, stage: " + stage + ", res: " + s);
             if (!runtimeLockedResources.TryGetValue(StageRes.Key2(stage, s), out sr))
             {
                 sr = new StageRes(stage, s);
@@ -166,7 +158,6 @@ namespace FillItUp
         }
         public void RemoveRuntimeLockedResource(int stage, string s)
         {
-            Debug.Log("RemoveRuntimeLockedResource, stage: " + stage + ", res: " + s);
 
             if (runtimeLockedResources.TryGetValue(StageRes.Key2(stage, s), out sr))
             {
@@ -220,7 +211,6 @@ namespace FillItUp
 
         public static FillItUpConfigNode LoadOrCreate()
         {
-            Debug.Log("FillItUpConfigNode");
             string fileFullPath = GetEnsuredConfigPath();
 
             ConfigNode file = ConfigNode.Load(fileFullPath);
