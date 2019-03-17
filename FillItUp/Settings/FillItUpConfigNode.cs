@@ -103,7 +103,7 @@ namespace FillItUp
                 return;
             string s = "";
             foreach (var s1 in value)
-            {;
+            {
                 if (s1.Value.stage == StageRes.ALLSTAGES)
                 {
                     if (s != "")
