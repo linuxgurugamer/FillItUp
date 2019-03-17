@@ -163,7 +163,6 @@ namespace FillItUp
             {
                 sr = new StageRes(stage, s);
                 runtimeLockedResources.Remove(sr.Key);
-                LoadRuntimeLockedResources(false);
                 LockedToNode(runtimeLockedResources);
             }
         }
