@@ -113,7 +113,6 @@ namespace FillItUp
                 }
             }
             _node.SetValue(RUNTIMELOCKED, s, true);
-            LoadRuntimeLockedResources(true);
         }
 
         public Dictionary<string, StageRes> RuntimeLockedResources
