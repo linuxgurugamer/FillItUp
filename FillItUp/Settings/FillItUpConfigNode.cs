@@ -103,7 +103,7 @@ namespace FillItUp
                 return;
             string s = "";
             foreach (var s1 in value)
-            {;
+            {
                 if (s1.Value.stage == StageRes.ALLSTAGES)
                 {
                     if (s != "")
@@ -113,7 +113,6 @@ namespace FillItUp
                 }
             }
             _node.SetValue(RUNTIMELOCKED, s, true);
-            LoadRuntimeLockedResources(true);
         }
 
         public Dictionary<string, StageRes> RuntimeLockedResources
@@ -163,7 +162,6 @@ namespace FillItUp
             {
                 sr = new StageRes(stage, s);
                 runtimeLockedResources.Remove(sr.Key);
-                LoadRuntimeLockedResources(false);
                 LockedToNode(runtimeLockedResources);
             }
         }
