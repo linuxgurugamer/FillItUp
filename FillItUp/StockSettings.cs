@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
+﻿
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using UnityEngine;
 
 
 
@@ -29,12 +24,6 @@ namespace FillItUp
 
         [GameParameters.CustomParameterUI("Save Locked Global Resource List",toolTip = "This option applies to the 'All Stages' window only")]
         public bool saveGlobalLocked = true;
-
-#if false
-        [GameParameters.CustomParameterUI("Save Locked Stage Resource List")]
-        public bool saveStageLocked = true;
-#endif
-
 
         [GameParameters.CustomParameterUI("Warn if launching without full tanks")]
         public bool warnAtLaunch = true;

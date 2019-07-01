@@ -48,3 +48,8 @@
 0.1.3.4
 	Thanks to github user @Hauke Lampe:
 		Fixed Exception caused when locking and unlocking resources
+
+0.1.4
+	Moved icons into icon folder
+	Updated AssemblyVersion.tt for location independent builds
+	Deleted old code

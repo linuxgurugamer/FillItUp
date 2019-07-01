@@ -1,16 +1,13 @@
-﻿using KSP.IO;
-using KSP.UI.Screens;
+﻿using KSP.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using FillItUp.Util;
 
 using ClickThroughFix;
 using ToolbarControl_NS;
 
-using SmartTank;
 
 namespace FillItUp
 {
@@ -480,8 +477,8 @@ namespace FillItUp
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
                 MODID,
                 "fillItUpButton",
-                "FillItUp/PluginData/FIUIcon_38",
-                "FillItUp/PluginData/FIUIcon_24",
+                "FillItUp/Icons/FIUIcon_38",
+                "FillItUp/Icons/FIUIcon_24",
                 MODNAME
             );
         }

@@ -1,9 +1,5 @@
-﻿using KSP.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using System.Collections.Generic;
+
 
 namespace FillItUp
 {
@@ -44,11 +40,6 @@ namespace FillItUp
             }
             key = new Tuple<string, int>(type, stage);
             float f;
-#if false
-            bool b = true;
-            if (model.TryGetValue(key, out f))
-                b = (amount != f);
-#endif
 
             bool b = model.TryGetValue(key, out f) ? (amount != f) : true;
             if (b)
@@ -113,18 +104,6 @@ namespace FillItUp
             
             if (Changed)
             {
-#if false
-                Log.Info("Apply Dict");
-                foreach (var s in stages)
-                {
-                    foreach (var s2 in s.Value.parts)
-                        Log.Info("Apply, Key: " + s.Key + ", part: " + s2);
-                    foreach (var s3 in s.Value.resources)
-                        Log.Info("Apply, Key: " + s.Key + ", resource: " + s3);
-                }
-                foreach (var m in model)
-                    Log.Info("model.Key: " + m.Key.First + ", " + m.Key.Second + ",   fuel: " + m.Value);
-#endif
                 foreach (var s in stages)
                 {
                     Apply(ship, s.Key, s.Value, true);

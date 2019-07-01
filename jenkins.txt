@@ -37,7 +37,9 @@
 #3:LICENSE.md,GameData/KerbalHotSeat
 #3:README.md,GameData/KerbalHotSeat
 
-
+NOT:1.4.5
+NOT:1.5.1
+NOT:1.6.1
 #
 # End of file
 #

@@ -1,12 +1,4 @@
-﻿using FillItUp.Util;
-using KSP.IO;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using UnityEngine;
+﻿using System.Linq;
 
 namespace FillItUp
 {
@@ -40,19 +32,6 @@ namespace FillItUp
 
         }
 
-#if false
-        public void Save()
-        {
-            string fileFullPath = GetEnsuredConfigPath();
-
-           
-
-            ConfigNode file = new ConfigNode();
-            file.AddNode(NODE, _node);
-            file.Save(fileFullPath);
-        }
-#endif
-
         #endregion
 
 
@@ -60,24 +39,7 @@ namespace FillItUp
 
         public static IgnoredResourcesConfigNode LoadOrCreate()
         {
-#if false
-            string fileFullPath = GetEnsuredConfigPath();
 
-            ConfigNode file = ConfigNode.Load(fileFullPath);
-            ConfigNode internalNode = null;
-
-            if (file != null)
-            {
-                if (file.HasNode(NODE))
-                    internalNode = file.GetNode(NODE);
-            }
-
-            if (internalNode == null)
-            {
-                internalNode = new ConfigNode();
-
-            }
-#endif
             ConfigNode internalNode = GameDatabase.Instance.GetConfigNode("FillItUp/" + NODE);
 
             if (internalNode == null)
@@ -95,14 +57,6 @@ namespace FillItUp
             return new IgnoredResourcesConfigNode(internalNode);
         }
 
-#if false
-        private static string GetEnsuredConfigPath()
-        {
-            string path = "GameData/FillItUp/IgnoredResources.cfg";
-
-            return path;
-        }
-#endif
 #endregion
     }
 }

@@ -1,12 +1,7 @@
 ﻿using FillItUp.Util;
-using KSP.IO;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using UnityEngine;
+
 
 namespace FillItUp
 {
@@ -126,23 +121,6 @@ namespace FillItUp
             set
             {
                 LockedToNode(value);
-#if false
-                string s = "";
-                foreach (var s1 in value)
-                {
-                    Debug.Log("stage: " + s1.Value.stage + ", s1.Value.resource: " + s1.Value.resource);
-                    if (s1.Value.stage == StageRes.ALLSTAGES && HighLogic.CurrentGame.Parameters.CustomParams<FIU>().saveGlobalLocked)
-                    {
-                        if (s != "")
-                            s += ";" + s1.Value.resource;
-                        else
-                            s = s1.Value.resource;
-                    }
-                }
-
-                _node.SetValue(IGNORED, s, true);
-                LoadRuntimeIgnoredResources();
-#endif
             }
         }
        
