@@ -53,3 +53,7 @@
 	Moved icons into icon folder
 	Updated AssemblyVersion.tt for location independent builds
 	Deleted old code
+
+0.2.0
+	Added InstallChecker
+	Updated for KSP 1.8
