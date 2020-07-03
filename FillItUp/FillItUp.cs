@@ -465,7 +465,6 @@ namespace FillItUp
 
         #region App Launcher
 
-        //ApplicationLauncherButton _afuButton = null;
         ToolbarControl toolbarControl = null;
 
         internal const string MODID = "FillItUp_NS";

@@ -59,3 +59,7 @@ ChangeLog
 0.2.0
 	Added InstallChecker
 	Updated for KSP 1.8
+
+0.2.0.1
+	Added random number to first windowId
+	Added support for ButtonManager

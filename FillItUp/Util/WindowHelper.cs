@@ -7,11 +7,16 @@ namespace FillItUp.Util
 {
     public class WindowHelper
     {
+        static System.Random random;
+        static int ransomSeed = 0;
         private static Dictionary<string, int> _windowDictionary;
         public static int NextWindowId(string windowKey)
         {
             if (_windowDictionary == null)
             {
+                int seed = (int)System.DateTime.Now.Ticks;
+                random = new System.Random(seed);
+                ransomSeed = random.Next();
                 _windowDictionary = new Dictionary<string, int>();
             }
 
@@ -20,7 +25,7 @@ namespace FillItUp.Util
                 return _windowDictionary[windowKey];
             }
 
-            var newId = _windowDictionary.Count() + 1;
+            var newId = ransomSeed + _windowDictionary.Count() + 1;
 
             _windowDictionary.Add(windowKey, newId);
 
