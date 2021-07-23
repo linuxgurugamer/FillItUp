@@ -63,3 +63,8 @@ ChangeLog
 0.2.0.1
 	Added random number to first windowId
 	Added support for ButtonManager
+
+0.2.0.2
+	Renamed DLL for CKAN compatibility
+	Added AssemblyFileVersion
+	Updated version file for 1.12
