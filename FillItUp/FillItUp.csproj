@@ -115,6 +115,7 @@ if $(ConfigurationName) == Release (
 	start /D $(SolutionDir) /WAIT buildRelease.bat $(TargetDir) $(TargetFileName) $(TargetName)
 
 )
+
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

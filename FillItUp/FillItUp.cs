@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using FillItUp.Util;
+using SmartTank;
 
 using ClickThroughFix;
 using ToolbarControl_NS;
@@ -17,6 +18,7 @@ namespace FillItUp
         static public FillItUp Instance;
         private int _windowId;
         private bool _toggleOn = false;
+        private bool heightReset = false;
         private FuelTypes.StageResDef allShipResources;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesByStage;
         private SortedDictionary<int, FuelTypes.StageResDef> allPartsResourcesShip;
@@ -201,10 +203,11 @@ namespace FillItUp
             }
             if (_toggleOn)
             {
-                if (Event.current.type == EventType.Layout)
+                if (Event.current.type == EventType.Layout && !heightReset)
                 {
                     _windowPosition.height = 100;
                     _windowPosition.width = 425;
+                    heightReset = true;
                 }
 
                 if (drawTooltip /* && HighLogic.CurrentGame.Parameters.CustomParams<JanitorsClosetSettings>().buttonTooltip*/ && tooltip != null && tooltip.Trim().Length > 0)
@@ -243,6 +246,9 @@ namespace FillItUp
 
             byStages = GUILayout.Toggle(byStages, new GUIContent("By stages", "Control resources in each stage"));
             GUILayout.EndHorizontal();
+
+            int numOldSliders = numSliders;
+            numSliders = 0;
             if (!byStages)
                 DoSingleStage(StageRes.ALLSTAGES, allShipResources, _resourcesShip, ref allFuels);
             else
@@ -251,10 +257,15 @@ namespace FillItUp
             if (Event.current.type == EventType.Repaint && GUI.tooltip != tooltip)
                 tooltip = GUI.tooltip;
 
+            if (numOldSliders != numSliders)
+            {
+                numOldSliders = numSliders;
+                heightReset = false;
+            }
 
             GUI.DragWindow();
         }
-
+        int numSliders = 0;
         void DoSingleStage(int stage, FuelTypes.StageResDef _fuelTypes, FuelModel _resources, ref float allFuels)
         {
             GUILayout.BeginHorizontal();
@@ -290,6 +301,7 @@ namespace FillItUp
                 //sliderStyle.padding.top += 5;
                 //GUI.skin.horizontalSlider = sliderStyle;
                 var newf = GUILayout.HorizontalSlider(f, 0, 100, GUILayout.Width(200));
+                numSliders++;
                 if (newf != f)
                 {
                     newf = Math.Max(0, Math.Min(100, newf));
@@ -373,12 +385,14 @@ namespace FillItUp
             if (numResVis > 20)
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.MinHeight(400), GUILayout.MaxHeight(700));
             int newNumResVis = 0;
+
             foreach (var s in allPartsResourcesByStage)
             {
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Stage " + (s.Key + 1).ToString()))
                 {
                     s.Value.stageExpanded = !s.Value.stageExpanded;
+                    heightReset = false;
                 }
                 GUILayout.EndHorizontal();
                 newNumResVis++;
@@ -485,7 +499,7 @@ namespace FillItUp
         void FIUFUToggle()
         {
             _toggleOn = !_toggleOn;
-
+            heightReset = false;
             if (smartTankPresent)
                 doSmartTank();
 
