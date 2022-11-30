@@ -71,3 +71,6 @@ ChangeLog
 
 0.2.0.3
 	Fixed issue with ClickThroughBlocker, caused by changing window height every frame
+
+0.2.0.4
+	Fixed path for loading images (broken by new launcher)

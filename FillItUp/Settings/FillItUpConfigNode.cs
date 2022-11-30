@@ -54,7 +54,7 @@ namespace FillItUp
 
         public void FIU_Save()
         {
-            string fileFullPath = GetEnsuredConfigPath();
+            string fileFullPath = GetEnsuredConfigPath;
             
             if (!_node.HasValue(RUNTIMELOCKED))
             {
@@ -187,7 +187,7 @@ namespace FillItUp
 
         public static FillItUpConfigNode LoadOrCreate()
         {
-            string fileFullPath = GetEnsuredConfigPath();
+            string fileFullPath = GetEnsuredConfigPath;
 
             ConfigNode file = ConfigNode.Load(fileFullPath);
             ConfigNode internalNode = null;
@@ -213,11 +213,12 @@ namespace FillItUp
         }
 
 
-        private static string GetEnsuredConfigPath()
+        private static string GetEnsuredConfigPath
         {
-            string path = "GameData/FillItUp/PluginData/FillItUp.cfg";
-            
-            return path;
+            get
+            {
+                return KSPUtil.ApplicationRootPath + "GameData/FillItUp/PluginData/FillItUp.cfg";
+            }
         }
 
 #endregion
