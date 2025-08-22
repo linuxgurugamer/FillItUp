@@ -74,3 +74,6 @@ ChangeLog
 
 0.2.0.4
 	Fixed path for loading images (broken by new launcher)
+
+0.2.0.5
+	Updated version file to use github for new version info
